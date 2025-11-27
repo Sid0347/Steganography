@@ -28,6 +28,22 @@ Status read_and_validate_encode_args(char *argv[], EncodeInfo *encInfo)
     if (strstr(argv[3], ".txt") != NULL)
     {
         encInfo->secret_fname = argv[3];
-        // strcpy(encInfo->extn_secret_file,h);
+        strncpy(encInfo->extn_secret_file, argv[3] + (strlen(argv[3]) - 4), 4);
     }
+    else
+        return e_failure;
+
+    /* Check Output file is given or not, If not create one default file */
+    if (encInfo->argc == 5)
+    {
+        if (strstr(argv[4], ".bmp") != NULL)
+        {
+            encInfo->stego_image_fname = argv[4];
+        }
+        else
+            e_failure;
+    }
+    else
+        encInfo->stego_image_fname = "stego.bmp";
+    
 }
