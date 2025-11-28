@@ -2,6 +2,7 @@
 #define ENCODE_H
 
 #include "types.h" // Contains user defined types
+#include "common.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -35,6 +36,9 @@ typedef struct _EncodeInfo
     /* Stego Image Info */
     char *stego_image_fname;
     FILE *fptr_stego_image;
+
+    /* Argument count Info */
+    int argc;
 
 } EncodeInfo;
 
