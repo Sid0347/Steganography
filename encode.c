@@ -69,13 +69,15 @@ Status do_encoding(EncodeInfo *encInfo)
         printf("SUCCESS: %s function completed\n", "encode_secret_file_size");
 
      /* Encode secret file data */
-    if (encode_secret_file_daya(encInfo) == e_failure)
+    if (encode_secret_file_data(encInfo) == e_failure)
     {
         printf("ERROR: %s function failed\n", "encode_secret_file_data");
         return e_failure;
     }
     else
         printf("SUCCESS: %s function completed\n", "encode_secret_file_data");
+
+    
 }
 
 /*----------------------------------------------------------------------------------*/
@@ -208,4 +210,12 @@ Status encode_secret_file_data(EncodeInfo *encInfo)
 {
     unsigned char buffer[8];
     
+    while (fread(encInfo->secret_data, 1, 1, encInfo->fptr_secret) == 1)
+    {
+        fread(buffer, 1, 8, encInfo->fptr_src_image);
+        if (encode_byte_to_lsb(encInfo->secret_data, buffer) == e_failure)
+            return e_failure;
+        fwrite(buffer, 1, 8, encInfo->fptr_stego_image);
+    }
+    return e_success;
 }
