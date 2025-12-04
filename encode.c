@@ -219,3 +219,29 @@ Status encode_secret_file_data(EncodeInfo *encInfo)
     }
     return e_success;
 }
+
+/*----------------------------------------------------------------------------------*/
+/* Copy remaining image data
+ * Inputs: Source and destination file pointer
+ * Output: Copy remaining image data
+ * Description: Copy all the remaining image data from source file to stego file.
+ */
+Status copy_remaining_img_data(FILE *fptr_src, FILE *fptr_dest)
+{
+    uint current_pos = ftell(fptr_src);
+    uint size = get_file_size(fptr_src);
+    fseek(fptr_src, current_pos, SEEK_SET);
+    uint remaining_data_bytes = size - current_pos;
+
+    unsigned char *buffer;
+    buffer = malloc(remaining_data_bytes);
+    if  (!buffer)
+    {
+        perror("Memory allocation failed.\n");
+        return e_failure;
+    }
+    fread(buffer, 1, remaining_data_bytes, fptr_src);
+    fwrite(buffer, 1, remaining_data_bytes, fptr_dest);
+
+    return e_success;
+}
