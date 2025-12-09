@@ -1,14 +1,11 @@
 #include "encode.h"
-
+#include "decode.h"
 int main(int argc, char *argv[])
 {
     EncodeInfo encInfo;
+    DecodeInfo decInfo;
 
-    encInfo.argc = argc;
-    // Fill with sample filenames
-    // encInfo.src_image_fname = "beautiful.bmp";
-    // encInfo.secret_fname = "secret.txt";
-    // encInfo.stego_image_fname = "stego_img.bmp";
+    int argc_count = argc;
 
     /* Check operation */
     int result = check_operation_type(argv);
@@ -19,7 +16,7 @@ int main(int argc, char *argv[])
         /* Read and validate Encode args from argv */
         if (read_and_validate_encode_args(argv, &encInfo) == e_failure)
         {
-            printf("The args validation failed.\n");
+            printf("The encode args validation failed.\n");
             return 1;
         }
         if (do_encoding(&encInfo) == e_failure)
@@ -31,6 +28,18 @@ int main(int argc, char *argv[])
     else if (result == e_decode)
     {
         // Decode
+        /* Read and validate Decode args from agrv */
+        if (read_and_validate_decode_args(argv, &decInfo) == e_failure)
+        {
+            printf("The decode args validation failed.\n");
+            return 1;
+        }
+        if (do_decoding(&decInfo) == e_failure)
+        {
+            printf("Do decoding failed.\n");
+            return 1;
+        }
+
     }
     else
     {
