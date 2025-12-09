@@ -47,3 +47,17 @@ Status open_stego_file(DecodeInfo *decInfo)
     return e_success;
 }
 
+/*----------------------------------------------------------------------------------*/
+/* Skip stego bmp header
+ * Inputs: Stego image file ptr
+ * Output: Skip header to stego image file
+ * Return values: e_success or e_failure
+ * Description: Skip the header part of stego file, because secret data was encoded after bmp header.
+*/
+Status skip_header(FILE *fptr_stego_fname)
+{
+    if (fseek(fptr_stego_fname, 55, SEEK_END) != 0)
+        return e_failure;
+
+    return e_success;
+}
