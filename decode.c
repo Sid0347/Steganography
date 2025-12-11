@@ -39,6 +39,7 @@ Status decode_byte_from_lsb(unsigned char data, unsigned char *image_buffer)
         printf("ERROR: Invalid buffer data in byte_from_lsb\n");
         return e_failure;
     }
+    data = 0;
     for (int i = 0; i < 8; i++)
     {
         int bit = image_buffer[i] & 1;
@@ -47,3 +48,25 @@ Status decode_byte_from_lsb(unsigned char data, unsigned char *image_buffer)
     return e_success;
 }
 
+/*----------------------------------------------------------------------------------*/
+/* Decode size to lsb.
+ * Inputs: Size of decode data
+ * Output: Decoded 32 bit from 32 bytes of encoded data.
+ * Description: Get 32 bytes from decoded file and and extract lsb and get secret data.
+ */
+Status decode_size_from_lsb(unsigned char data, unsigned char *image_buffer)
+{
+    /* Check if buffer is valid or not */
+    if (image_buffer == NULL)
+    {
+        printf("ERROR: Invalid buffer data in size_from_lsb");
+        return e_failure;
+    }
+    data = 0;
+    for (int i = 0; i < 32; i++)
+    {
+        int bit = image_buffer[i] & 1;
+        data = bit << (31 - i);
+    }
+    return e_success;
+}
