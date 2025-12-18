@@ -36,7 +36,7 @@ Status read_and_validate_encode_args(char *argv[], EncodeInfo *encInfo)
         return e_failure;
 
     /* Check Output file is given or not, If not create one default file */
-    if (encInfo->argc == 5)
+    if (argc_count == 5)
     {
         if (strstr(argv[4], ".bmp") != NULL)
             encInfo->stego_image_fname = argv[4];
@@ -151,7 +151,7 @@ Status check_capacity(EncodeInfo *encInfo)
 
     /* Get size of secret file */
     encInfo->size_secret_file = get_file_size(encInfo->fptr_secret);
-    printf("INFO: File size = %u\n", encInfo->size_secret_file);
+    printf("INFO: File size = %lu\n", encInfo->size_secret_file);
 
     if (encInfo->image_capacity > (2 * 8 + 32 + 32 + 32 + encInfo->size_secret_file * 8))   /* Image capacity should be greater than all encoding data */
     {
@@ -168,7 +168,7 @@ Status check_capacity(EncodeInfo *encInfo)
  * Inputs: source bmp file ptr and Stego image file ptr
  * Output: Copy header to stego image file
  * Return values: e_success or e_failure
- * Description: Header file contains all data of bmp file, so header should be copy as it is in stego image file
+ * Description: Header contains all data of bmp file, so header should be copy as it is in stego image file
 */
 Status copy_bmp_header(FILE *fptr_src_image, FILE *fptr_dest_image)
 {
