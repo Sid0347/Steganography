@@ -1,8 +1,15 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#include "common.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 /* User defined types */
 typedef unsigned int uint;
+
+/* Argument count Info */
+    extern int argc_count;
 
 /* Status will be used in fn. return type */
 typedef enum
