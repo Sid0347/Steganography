@@ -1,7 +1,7 @@
 #include "encode.h"
 
-/* Function Definitions */
-
+/*----------------------------Encode Function Definitions---------------------------*/
+/*----------------------------------------------------------------------------------*/
 /* Perform the encoding */
 Status do_encoding(EncodeInfo *encInfo)
 {
@@ -59,7 +59,7 @@ Status do_encoding(EncodeInfo *encInfo)
     else
         printf("SUCCESS: %s function completed\n", "encode_secret_file_extn");
 
-     /* Encode secret file size */
+    /* Encode secret file size */
     if (encode_secret_file_size(encInfo->size_secret_file, encInfo) == e_failure)
     {
         printf("ERROR: %s function failed\n", "encode_secret_file_size");
@@ -68,7 +68,7 @@ Status do_encoding(EncodeInfo *encInfo)
     else
         printf("SUCCESS: %s function completed\n", "encode_secret_file_size");
 
-     /* Encode secret file data */
+    /* Encode secret file data */
     if (encode_secret_file_data(encInfo) == e_failure)
     {
         printf("ERROR: %s function failed\n", "encode_secret_file_data");
@@ -77,11 +77,20 @@ Status do_encoding(EncodeInfo *encInfo)
     else
         printf("SUCCESS: %s function completed\n", "encode_secret_file_data");
 
-    
+    /* Copy remaining image bytes from src to stego image after encoding */
+    if (copy_remaining_img_data(encInfo->fptr_src_image, encInfo->fptr_stego_image) == e_failure)
+    {
+        printf("ERROR: %s function failed\n", "copy_remaining_img_data");
+        return e_failure;
+    }
+    else
+        printf("SUCCESS: %s function completed\n", "copy_remaining_img_data");
+
+    return e_success;
 }
 
 /*----------------------------------------------------------------------------------*/
-/* Encode one byte from lsb.
+/* Encode one byte to lsb.
  * Inputs: Single character to encode and 8 raw bytes from source file
  * Output: Encoded 8 bytes with single byte
  * Description: Get bit from encode byte and replace in 8 bytes lsb of raw RGB data
@@ -104,7 +113,7 @@ Status encode_byte_to_lsb(unsigned char data, unsigned char *image_buffer)
 }
 
 /*----------------------------------------------------------------------------------*/
-/* Encode one byte from lsb.
+/* Encode size to lsb.
  * Inputs: Size of encode data
  * Output: Encoded 32 bytes with 32 bit data
  * Description: Get bit from encode byte and replace in 32 bytes lsb of raw RGB data
@@ -135,7 +144,7 @@ Status encode_size_to_lsb(long size, unsigned char *image_buffer)
 Status encode_magic_string(const char *magic_string, EncodeInfo *encInfo)
 {
     unsigned char buffer[8];
-    for (int i = 0; magic_string != '\0'; i++)
+    for (int i = 0; magic_string[i] != '\0'; i++)
     {
         fread(buffer, 1, 8, encInfo->fptr_src_image);
         if (encode_byte_to_lsb(magic_string[i], buffer) == e_failure)
@@ -155,11 +164,11 @@ Status encode_secret_file_extn_size(long file_extn_size, EncodeInfo *encInfo)
 {
     unsigned char buffer[32];
 
-        fread(buffer, 1, 32, encInfo->fptr_src_image);
-        if (encode_size_to_lsb(file_extn_size, buffer) == e_failure)
-            return e_failure;
-        fwrite(buffer, 1, 32, encInfo->fptr_stego_image);
-    
+    fread(buffer, 1, 32, encInfo->fptr_src_image);
+    if (encode_size_to_lsb(file_extn_size, buffer) == e_failure)
+        return e_failure;
+    fwrite(buffer, 1, 32, encInfo->fptr_stego_image);
+
     return e_success;
 }
 
@@ -172,7 +181,7 @@ Status encode_secret_file_extn_size(long file_extn_size, EncodeInfo *encInfo)
 Status encode_secret_file_extn(const char *file_extn, EncodeInfo *encInfo)
 {
     unsigned char buffer[8];
-    for (int i = 0; file_extn != '\0'; i++)
+    for (int i = 0; file_extn[i] != '\0'; i++)
     {
         fread(buffer, 1, 8, encInfo->fptr_src_image);
         if (encode_byte_to_lsb(file_extn[i], buffer) == e_failure)
@@ -185,18 +194,18 @@ Status encode_secret_file_extn(const char *file_extn, EncodeInfo *encInfo)
 /*----------------------------------------------------------------------------------*/
 /* Encode secret file size.
  * Inputs: Stored file secret file size and structure
- * Output: Encoded secret file size 
+ * Output: Encoded secret file size
  * Description: Get stored secrete file size from the structure and return encoded data to store in stego file.
  */
 Status encode_secret_file_size(long file_size, EncodeInfo *encInfo)
 {
     unsigned char buffer[32];
 
-        fread(buffer, 1, 32, encInfo->fptr_src_image);
-        if (encode_size_to_lsb(file_size, buffer) == e_failure)
-            return e_failure;
-        fwrite(buffer, 1, 32, encInfo->fptr_stego_image);
-    
+    fread(buffer, 1, 32, encInfo->fptr_src_image);
+    if (encode_size_to_lsb(file_size, buffer) == e_failure)
+        return e_failure;
+    fwrite(buffer, 1, 32, encInfo->fptr_stego_image);
+
     return e_success;
 }
 
@@ -209,11 +218,11 @@ Status encode_secret_file_size(long file_size, EncodeInfo *encInfo)
 Status encode_secret_file_data(EncodeInfo *encInfo)
 {
     unsigned char buffer[8];
-    
+
     while (fread(encInfo->secret_data, 1, 1, encInfo->fptr_secret) == 1)
     {
         fread(buffer, 1, 8, encInfo->fptr_src_image);
-        if (encode_byte_to_lsb(encInfo->secret_data, buffer) == e_failure)
+        if (encode_byte_to_lsb(encInfo->secret_data[0], buffer) == e_failure) /* secret_data declared as char array so passing just name is considered as pointer.*/
             return e_failure;
         fwrite(buffer, 1, 8, encInfo->fptr_stego_image);
     }
@@ -235,7 +244,7 @@ Status copy_remaining_img_data(FILE *fptr_src, FILE *fptr_dest)
 
     unsigned char *buffer;
     buffer = malloc(remaining_data_bytes);
-    if  (!buffer)
+    if (!buffer)
     {
         perror("Memory allocation failed.\n");
         return e_failure;
