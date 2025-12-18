@@ -1,10 +1,7 @@
 #ifndef ENCODE_H
 #define ENCODE_H
 
-#include "types.h" // Contains user defined types
-#include "common.h"
-#include <stdio.h>
-#include <string.h>
+#include "types.h" /* Contains user defined types and fnc return types */
 
 /* 
  * Structure to store information required for
@@ -29,16 +26,13 @@ typedef struct _EncodeInfo
     /* Secret File Info */
     char *secret_fname;
     FILE *fptr_secret;
-    char extn_secret_file[MAX_FILE_SUFFIX];
+    char extn_secret_file[MAX_FILE_SUFFIX + 1];
     char secret_data[MAX_SECRET_BUF_SIZE];
     long size_secret_file;
 
     /* Stego Image Info */
     char *stego_image_fname;
     FILE *fptr_stego_image;
-
-    /* Argument count Info */
-    int argc;
 
 } EncodeInfo;
 
@@ -81,11 +75,14 @@ Status encode_secret_file_size(long file_size, EncodeInfo *encInfo);
 /* Encode secret file data*/
 Status encode_secret_file_data(EncodeInfo *encInfo);
 
-/* Encode function, which does the real encoding */
-Status encode_data_to_image(char *data, int size, FILE *fptr_src_image, FILE *fptr_stego_image);
+/* Encode secret file extenstion size */
+Status encode_secret_file_extn_size(long extn_secret_file, EncodeInfo *encInfo);
 
 /* Encode a byte into LSB of image data array */
-Status encode_byte_to_lsb(char data, char *image_buffer);
+Status encode_byte_to_lsb(unsigned char data, unsigned char *image_buffer);
+
+/* Encode a size into LSB of image data array */
+Status encode_size_to_lsb(long size, unsigned char *image_buffer);
 
 /* Copy remaining image bytes from src to stego image after encoding */
 Status copy_remaining_img_data(FILE *fptr_src, FILE *fptr_dest);
