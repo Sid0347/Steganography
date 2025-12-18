@@ -166,3 +166,22 @@ Status decode_secret_file_extn(DecodeInfo *decInfo)
 
     return e_success;
 }
+
+/*----------------------------------------------------------------------------------*/
+/* Decode secret file size.
+ * Inputs: Structure members.
+ * Output: Encoded secret file size.
+ * Description: Get 32 byte of encoded data from stego file and and extract actual size of secret file.
+ */
+Status decode_secret_file_size(DecodeInfo *decInfo)
+{
+    unsigned char buffer[32];
+
+    if (fread(buffer, 1, 32, decInfo->fptr_stego_image) != 32)
+        return e_failure;
+    
+    if(decode_size_from_lsb(&decInfo->size_secret_file, buffer) == e_failure)
+        return e_failure;
+    
+    return e_success;
+}
