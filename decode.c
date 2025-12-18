@@ -14,6 +14,7 @@ Status do_decoding(DecodeInfo *decInfo)
     else
         printf("SUCCESS: %s function completed\n", "open_stego_file");
 
+    /* Skip header of stego.bmp */
     if (skip_header(decInfo->fptr_stego_image) == e_failure)
     {
         printf("ERROR: %s function failed\n", "skip_header");
@@ -22,6 +23,7 @@ Status do_decoding(DecodeInfo *decInfo)
     else
         printf("SUCCESS: %s function completed\n", "skip_header");
 
+    /* Decode Magic String */
     if (decode_magic_string(decInfo) == e_failure)
     {
         printf("ERROR: %s function failed\n", "decode_magic_string");
@@ -29,6 +31,17 @@ Status do_decoding(DecodeInfo *decInfo)
     }
     else
         printf("SUCCESS: %s function completed\n", "decode_magic_string");
+
+    /* Decode secret file extenstion size */
+    if (decode_secret_file_extn_size(decInfo) == e_failure)
+    {
+         printf("ERROR: %s function failed\n", "decode_secret_file_extn_size");
+        return e_failure;
+    }
+    else
+        printf("SUCCESS: %s function completed\n", "decode_secret_file_extn_size");
+
+    
 }
 
 /*----------------------------------------------------------------------------------*/
@@ -60,7 +73,7 @@ Status decode_byte_from_lsb(unsigned char *data, unsigned char *image_buffer)
  * Output: Decoded 32 bit from 32 bytes of encoded data.
  * Description: Get 32 bytes from decoded file and and extract lsb and get secret data.
  */
-Status decode_size_from_lsb(unsigned char *data, unsigned char *image_buffer)
+Status decode_size_from_lsb(long *size, unsigned char *image_buffer)
 {
     /* Check if buffer is valid or not */
     if (image_buffer == NULL)
@@ -68,11 +81,11 @@ Status decode_size_from_lsb(unsigned char *data, unsigned char *image_buffer)
         printf("ERROR: Invalid buffer data in size_from_lsb");
         return e_failure;
     }
-    *data = 0;
+    *size = 0;
     for (int i = 0; i < 32; i++)
     {
         int bit = image_buffer[i] & 1;
-        *data |= bit << (31 - i);
+        *size |= bit << (31 - i);
     }
     return e_success;
 }
@@ -87,15 +100,16 @@ Status decode_magic_string(DecodeInfo *decInfo)
 {
     char str[3];
     printf("Enter magic string to validation : ");  /* To know wether stego file contain encoded data or not. */
-    scanf("%[^\n]", str);
+    scanf("%2[^\n]", str);
     unsigned char magic_string[3];
 
     for (int i = 0; i < 2; i++)
     {
-        fread(decInfo->image_data, 1, 8, decInfo->fptr_stego_image);
+        if (fread(decInfo->image_data, 1, 8, decInfo->fptr_stego_image) != 8)
+            return e_failure;
         if (decode_byte_from_lsb(decInfo->secret_data, decInfo->image_data) == e_failure)
             return e_failure;
-        magic_string[i] = decInfo->secret_data;
+        magic_string[i] = decInfo->secret_data[0];
     }
     magic_string[2] = '\0';
     if (strcmp(str, magic_string) != 0)
@@ -103,5 +117,23 @@ Status decode_magic_string(DecodeInfo *decInfo)
         printf("Magic string not matched decoding not possible\n");
         return e_failure;
     }
+    return e_success;
+}
+
+/*----------------------------------------------------------------------------------*/
+/* coDede secret file extenstion size.
+ * Inputs: structure
+ * Output: Decoded size of secret file extenstion
+ * Description: Get 32 bytes of decoded data from stego file and store actual size of secret file extenstion size.
+ */
+Status decode_secret_file_extn_size(DecodeInfo *decInfo)
+{
+    unsigned char buffer[32];
+
+    if (fread(buffer, 1, 32, decInfo->fptr_stego_image) != 32)
+        return e_failure;
+
+    if (decode_size_from_lsb(&decInfo->size_secret_extn, buffer) == e_failure)
+        return e_failure;
     return e_success;
 }
