@@ -137,3 +137,32 @@ Status decode_secret_file_extn_size(DecodeInfo *decInfo)
         return e_failure;
     return e_success;
 }
+
+/*----------------------------------------------------------------------------------*/
+/* Decode secret file extenstion.
+ * Inputs: Structure
+ * Output: Decoded secret file extenstion
+ * Description: Get no of extn size encoded bytes from stego file and decode it and give file extenstion.
+ */
+Status decode_secret_file_extn(DecodeInfo *decInfo)
+{
+    for (int i = 0; i < decInfo->size_secret_extn; i++)
+    {
+        if (fread(decInfo->image_data, 1, 8, decInfo->fptr_stego_image) != 8)
+            return e_failure;
+        
+        if (decode_byte_from_lsb(decInfo->secret_data, decInfo->image_data) == e_failure)
+            return e_failure;
+
+        decInfo->extn_secret_file[i] = decInfo->secret_data[0];
+    }
+    decInfo->extn_secret_file[4] = '\0';
+    /* Concatenate secret file name with it's extenstion. */
+    strcat(decInfo->secret_fname, decInfo->extn_secret_file);
+
+    /* Open secret file in 'w' mode. */
+    if (open_secret_file(decInfo) == e_failure)
+        return e_failure;
+
+    return e_success;
+}
