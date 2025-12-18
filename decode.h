@@ -10,16 +10,21 @@
  * also stored
 */
 
+#define MAX_SECRET_BUF_SIZE 1
+#define MAX_IMAGE_BUF_SIZE (MAX_SECRET_BUF_SIZE * 8)
 #define MAX_FILE_SUFFIX 4
+
 typedef struct _DecodeInfo
 {
     /* Stego Image Info */
     char *stego_image_fname;
     FILE *fptr_stego_image;
+    unsigned char image_data[MAX_IMAGE_BUF_SIZE];
 
     /* Secret File Info */
     char *secret_fname;
     FILE *fptr_secret;
+    unsigned char secret_data[MAX_SECRET_BUF_SIZE];
     char extn_secret_file[MAX_FILE_SUFFIX + 1];
     long size_secret_extn;
     long size_secret_file;
@@ -55,7 +60,14 @@ Status decode_secret_file_extn(DecodeInfo *decInfo);
 /* Decode secret file size */
 Status decode_secret_file_size(DecodeInfo *decInfo);
 
-/* Decofe secret file data */
+/* Decode secret file data */
 Status decode_secret_file_data(DecodeInfo *decInfo);
+
+/* Decode one byte from LSB */
+Status decode_byte_from_lsb(unsigned char *data, unsigned char *image_buffer);
+
+/* Decode a size from LSB */
+Status decode_size_from_lsb(unsigned char *data, unsigned char *image_buffer);
+
 
 #endif
