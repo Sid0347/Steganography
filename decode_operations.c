@@ -3,7 +3,7 @@
 /* Decoding Operations Defination */
 
 /* Read and validate Decode args from argv */
-Status read_and_validate_decode_args(char *argv[], DecodeInfo *decInfo)
+Status read_and_validate_decode_args(int argc, char *argv[], DecodeInfo *decInfo)
 {
     /* Check for the stego bmp file */
     if (strstr(argv[2], ".bmp") != NULL)
@@ -14,7 +14,7 @@ Status read_and_validate_decode_args(char *argv[], DecodeInfo *decInfo)
         return e_failure;
 
     /* Check for the output file */
-    if (argc_count == 4)
+    if (argc == 4)
     {
         decInfo->secret_fname = strtok(argv[3], ".");
         if (decInfo->secret_fname == NULL)
@@ -22,7 +22,7 @@ Status read_and_validate_decode_args(char *argv[], DecodeInfo *decInfo)
     }
     else
     {
-        decInfo->secret_fname = "secret";
+        decInfo->secret_fname = "Decoded_secret";
     }
 }
 
@@ -56,7 +56,7 @@ Status open_stego_file(DecodeInfo *decInfo)
  */
 Status skip_header(FILE *fptr_stego_fname)
 {
-    if (fseek(fptr_stego_fname, 55, SEEK_END) != 0)
+    if (fseek(fptr_stego_fname, 54, SEEK_SET) != 0)
         return e_failure;
 
     return e_success;
