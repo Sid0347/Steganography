@@ -24,8 +24,8 @@ typedef struct _DecodeInfo
     /* Secret File Info */
     char *secret_fname;
     FILE *fptr_secret;
-    unsigned char secret_data[MAX_SECRET_BUF_SIZE];
-    char extn_secret_file[MAX_FILE_SUFFIX + 1];
+    unsigned char secret_data;
+    char extn_secret_file[MAX_FILE_SUFFIX + 2];
     long size_secret_extn;
     long size_secret_file;
 
@@ -34,7 +34,7 @@ typedef struct _DecodeInfo
 /* Decoding function prototype */
 
 /* Read and validate Encode args from argv */
-Status read_and_validate_decode_args(char *argv[], DecodeInfo *decInfo);
+Status read_and_validate_decode_args(int argc, char *argv[], DecodeInfo *decInfo);
 
 /* Perform the decoding */
 Status do_decoding(DecodeInfo *decInfo);
@@ -43,7 +43,7 @@ Status do_decoding(DecodeInfo *decInfo);
 Status open_stego_file(DecodeInfo *decInfo);
 
 /* Open secret file */
-Status open_secret_file(FILE *fptr_secret);
+Status open_secret_file(DecodeInfo *decInfo);
 
 /* Skip header of stego.bmp */
 Status skip_header(FILE *fptr_stego_image);
@@ -52,7 +52,7 @@ Status skip_header(FILE *fptr_stego_image);
 Status decode_magic_string(DecodeInfo *decInfo);
 
 /* Decode secret file extenstion size */
-Status decode_secret_file_extn_size(DecodeInfo *decInfo, long extn_size);
+Status decode_secret_file_extn_size(DecodeInfo *decInfo);
 
 /* Decode secret file extenstion */
 Status decode_secret_file_extn(DecodeInfo *decInfo);
@@ -67,7 +67,7 @@ Status decode_secret_file_data(DecodeInfo *decInfo);
 Status decode_byte_from_lsb(unsigned char *data, unsigned char *image_buffer);
 
 /* Decode a size from LSB */
-Status decode_size_from_lsb(unsigned char *data, unsigned char *image_buffer);
+Status decode_size_from_lsb(long *size, unsigned char *image_buffer);
 
 
 #endif
