@@ -16,7 +16,7 @@ OperationType check_operation_type(char *argv[])
 }
 /*----------------------------------------------------------------------------------*/
 /* Read and validate Encode args from argv */
-Status read_and_validate_encode_args(char *argv[], EncodeInfo *encInfo)
+Status read_and_validate_encode_args(int argc, char *argv[], EncodeInfo *encInfo)
 {
     /* Check source file extention */
     if (strstr(argv[2], ".bmp") != NULL)
@@ -36,7 +36,7 @@ Status read_and_validate_encode_args(char *argv[], EncodeInfo *encInfo)
         return e_failure;
 
     /* Check Output file is given or not, If not create one default file */
-    if (argc_count == 5)
+    if (argc == 5)
     {
         if (strstr(argv[4], ".bmp") != NULL)
             encInfo->stego_image_fname = argv[4];
