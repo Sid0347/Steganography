@@ -8,9 +8,6 @@
 /* User defined types */
 typedef unsigned int uint;
 
-/* Argument count Info */
-    extern int argc_count;
-
 /* Status will be used in fn. return type */
 typedef enum
 {
