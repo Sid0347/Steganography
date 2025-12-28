@@ -5,16 +5,14 @@ int main(int argc, char *argv[])
     EncodeInfo encInfo;
     DecodeInfo decInfo;
 
-    int argc_count = argc;
-
     /* Check operation */
     int result = check_operation_type(argv);
     if (result == e_encode)
     {
         
-        // Encoding
+        /*---------- Encoding ----------*/
         /* Read and validate Encode args from argv */
-        if (read_and_validate_encode_args(argv, &encInfo) == e_failure)
+        if (read_and_validate_encode_args(argc, argv, &encInfo) == e_failure)
         {
             printf("The encode args validation failed.\n");
             return 1;
@@ -27,9 +25,17 @@ int main(int argc, char *argv[])
     }
     else if (result == e_decode)
     {
-        // Decode
+        /*----------Decode----------*/
+        /* Allocating memory to secret file name to store from decoding. */
+        decInfo.secret_fname = malloc(30);
+        if (!decInfo.secret_fname)
+        {
+            printf("Memory allocation failed for secret fname\n");
+            return e_failure;
+        }
+        
         /* Read and validate Decode args from agrv */
-        if (read_and_validate_decode_args(argv, &decInfo) == e_failure)
+        if (read_and_validate_decode_args(argc, argv, &decInfo) == e_failure)
         {
             printf("The decode args validation failed.\n");
             return 1;
